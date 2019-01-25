@@ -33,11 +33,26 @@ router.post('/register', (req, res) => {
     .catch(err => res.status(500).send(err));
 });
 
-function login(req, res) {
+router.post('/login', (req, res) => {
   // implement user login
-}
+  const userCreds = req.body;
 
-router.get('/jokes', (req, res) => {
+  db.findByUsername(userCreds.username)
+    .first() // returns the first single object (containing the user found) in the array. If no objects were found, an empty array is returned.
+    .then(user => {
+      // If user object was obtained AND...
+      // the client password matches the db hash password
+      if (user && bcrypt.compareSync(userCreds.password, user.password)) {
+        const token = generateToken(user);
+        res.status(200).json({ message: 'Logged in', token });
+      } else {
+        res.status(401).json({ err: 'You shall not pass!' });
+      }
+    })
+    .catch(err => res.status(500).send(err));
+});
+
+router.get('/jokes', authenticate, (req, res) => {
   const requestOptions = {
     headers: { accept: 'application/json' }
   };

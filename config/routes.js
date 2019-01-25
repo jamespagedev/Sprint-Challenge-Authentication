@@ -11,7 +11,6 @@ const router = express.Router();
  ******************************************** middleware *******************************************
  **************************************************************************************************/
 const authenticate = require('../auth/authenticate.js');
-const authorize = require('../auth/authorize.js');
 const generateToken = require('../auth/generateToken.js');
 
 /***************************************************************************************************
@@ -28,7 +27,8 @@ router.post('/register', (req, res) => {
 
   db.addUser(newUserCreds)
     .then(Ids => {
-      res.status(201).json({ id: Ids[0] }); // returns the userId created by the database
+      const token = generateToken(user); // automatically logs in after register
+      res.status(201).json({ id: Ids[0], token }); // returns the userId created by the database, and the token string
     })
     .catch(err => res.status(500).send(err));
 });

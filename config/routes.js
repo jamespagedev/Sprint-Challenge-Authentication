@@ -27,8 +27,17 @@ router.post('/register', (req, res) => {
 
   db.addUser(newUserCreds)
     .then(Ids => {
-      const token = generateToken(user); // automatically logs in after register
-      res.status(201).json({ id: Ids[0], token }); // returns the userId created by the database, and the token string
+      db.findByUsername(newUserCreds.username)
+        .first()
+        .then(user => {
+          if (user) {
+            const token = generateToken(user); // Token should result as guest permissions until user verifies (via email)
+            res.status(201).json({ id: Ids[0], token }); // returns the userId created by the database, and the token string
+          } else {
+            res.status(401).json({ err: 'You shall not pass!' });
+          }
+        })
+        .catch(err => res.status(500).send(err));
     })
     .catch(err => res.status(500).send(err));
 });

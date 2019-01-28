@@ -12,7 +12,7 @@ const DivWrapper = styled.div`
   margin: 0 auto;
   max-width: 800px;
   min-width: 800px;
-  min-height: 100%;
+  height: 100%;
 `;
 
 /***************************************************************************************************
